@@ -1,5 +1,7 @@
 """Database functions
-   This file came from the scaffold template. Not used. left it for future cohort."""
+   This file came from the scaffold template. Not used. left it for future cohort. 
+   just in case they want to rebuild it from the ground up
+   """
 
 import os
 

@@ -17,13 +17,13 @@ To use these interactive docs:
 - Click the **Execute** button
 - Scroll down to see the Server response Code & Details
 
-To edit description after some endpoints has been added.
-Edit your app's title and description. See [https://fastapi.tiangolo.com/tutorial/metadata/](https://fastapi.tiangolo.com/tutorial/metadata/)
+
+
 
 """
 
 app = FastAPI(
-    title='Family Promise of Spokane - Labs 29 ',
+    title='Family Promise of Spokane - Labs 30 ',
     description=description,
     docs_url='/',
 )

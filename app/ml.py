@@ -69,9 +69,10 @@ async def predict(guest_info: PersonInfo):
     feats = {}
     for k,v in top_feats.items():
         feats[k] = v
-
-    return { 
+    
+    exit = { 
         'member_id': guest_info.member_id,
         'exit_strategy': y_pred[0],
         'top_features': feats
     }
+    return exit
