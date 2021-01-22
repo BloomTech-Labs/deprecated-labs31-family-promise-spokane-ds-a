@@ -24,7 +24,7 @@ def set_variables(member_id):
   #current date for Days/ Years calculations
   today_date = datetime.date.today()
   results_dict = {} # Dictionary to hold the results value to be transformed to df
-  uri = os.getenv('DB_URL') # enviromental variable Database Credentials 
+  uri = "postgres://qeyoueftvuqkjx:b882be9425518a34bdcf7935a20ae6056b4c573434e2af60cb9e2e49be5a5ec3@ec2-75-101-212-64.compute-1.amazonaws.com:5432/dfquamst4ie67a" # enviromental variable Database Credentials 
 
   # Query used to pull the data from database. 
   # When Using new Model Use the following instead
