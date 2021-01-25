@@ -34,6 +34,9 @@ def set_variables(member_id):
   query = 'SELECT * FROM members where id = {}'.format(member_id)
   results = dbmanage(uri,query)
 
+  # checking if the dob is with "/" instead of "-"
+  results['demographics']['DOB'] = results['demographics']['DOB'].replace('/', '-')
+
   #sets variables from the db results
   results_dict['case_members'] = results['case_members']
   results_dict['race'] = results['demographics']['race']
@@ -41,6 +44,7 @@ def set_variables(member_id):
   results_dict['current_age'] = int((today_date - datetime.datetime.strptime(
       results['demographics']['DOB'], '%m-%d-%Y').date()).days / 365.2425
       )
+  
   results_dict['gender'] = results['demographics']['gender']
   results_dict['length_of_stay'] = results['length_of_stay']
   results_dict['enrollment_length'] = int((today_date - results['date_of_enrollment']).days)
@@ -51,6 +55,9 @@ def set_variables(member_id):
     if item == True:
       results_dict['barrier_count'] += 1
   #returns the final result
+
+  # Engineering new features for the updated model
+
   return results_dict
 if __name__ == '__main__':
       # Prints the results (Just for debugging) 

@@ -51,6 +51,40 @@ async def show_viz(guest_info: PersonInfo):
    
    return fig_list
 
+
+@router.get('/Visualizations/{guest_info}')
+async def display(guest_info: int):
+
+  # load the 
+   get_feats = predicter(guest_info)
+
+   # Loading the pickled model 
+   #model = load('app/assets/randomforest_modelv3.pkl')
+
+   
+   # Extracting only the top 3 features from the model
+   feats = get_feats['top_features']
+
+   # The dictionary that will be returned containing all 3 
+   # Visualizations for the front end 
+   fig_list = {}
+
+   # A for-loop to auto generate visualizations. 
+   for k, v in enumerate(feats):
+      # Assigning the y variable to a listed version of v (the column in the dict)
+      y = [v]
+      
+      # Making a numpy array to turn into a dataframe
+      arr = np.array([feats[v]])
+      df = pd.DataFrame(arr, columns=y)
+
+
+      fig = px.bar(df)
+      js = fig.to_json()
+      fig_list[k] = js
+
+   
+   return fig_list
    # def shap_predict(row, model, num_features=5):
    #    # TODO: Add db_manager to this so we can 
    #    # easily get the df row. (might have to be inside of the main function.)

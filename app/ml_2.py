@@ -34,8 +34,8 @@ class PersonInfo(BaseModel):
         '''Validate member id is 0 or greater than 0 '''
         assert value >= 0, f'member_id == {value} must be > 0'
         return value
-        
-def predicter(guest_info: PersonInfo):
+
+def predicter(guest_info):
     '''# Data model base working model 
        # Usage: 
          - member_id (integer) Exmple : 232314 #id from members table         
@@ -44,7 +44,7 @@ def predicter(guest_info: PersonInfo):
         
     #Prediction Pipe
     # Calls function to get data from database according to id provided
-    results = db_manager.set_variables(guest_info.member_id)
+    results = db_manager.set_variables(guest_info)
 
     # Loads the pickled Model 
     # a new model can be serialize from the Data Exploration notebook
@@ -74,7 +74,7 @@ def predicter(guest_info: PersonInfo):
         feats[k] = v
     
     exit = { 
-        'member_id': guest_info.member_id,
+        'member_id': guest_info,
         'exit_strategy': y_pred[0],
         'top_features': feats
     }
