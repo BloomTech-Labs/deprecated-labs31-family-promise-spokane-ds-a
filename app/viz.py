@@ -79,8 +79,11 @@ async def display_shap_predict(guest_info: PersonInfo):
    encoder = model.named_steps['ord']
    encoded_columns = encoder.transform(X).columns
 
+   #Gets figure
    fig = shap_predict(encoder.transform(X), model['classifier'])
+   #Transforms to pickle
    imdata = pickle.dumps(fig)
+   #transforms pickle to json
    jstr = json.dumps({"image": base64.b64encode(imdata).decode('ascii')})
    return jstr
 
