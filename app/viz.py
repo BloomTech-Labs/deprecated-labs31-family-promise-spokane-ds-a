@@ -82,7 +82,7 @@ async def display_shap_predict(guest_info: PersonInfo):
    fig = shap_predict(encoder.transform(X), model['classifier'])
    imdata = pickle.dumps(fig)
    jstr = json.dumps({"image": base64.b64encode(imdata).decode('ascii')})
-   return fig
+   return jstr
 
 def shap_predict(row, model, num_features=5):
       # TODO: Add db_manager to this so we can
