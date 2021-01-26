@@ -21,6 +21,11 @@ scikit-learn = "*"
 category-encoders = "*"
 joblib = "*"
 psycopg2-binary = "*"
+shap = "*"
+python-dotenv = "*"
+psycopg2 = "*"
+plotly = "*"
+ipython = "*"
 
 [requires]
 python_version = "3"
