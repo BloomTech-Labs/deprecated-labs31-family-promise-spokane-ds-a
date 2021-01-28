@@ -92,7 +92,7 @@ async def display(guest_info: int):
    
    return fig_list
 
-@router.get('/Shap_predict')
+@router.get('/Shap_predict/{guest_info}')
 async def display_shap_predict(guest_info: int):
    # load the
    get_feats = predicter(guest_info)
