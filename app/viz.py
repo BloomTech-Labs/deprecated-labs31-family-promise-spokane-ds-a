@@ -11,6 +11,8 @@ from app import ml, db_manager
 from app.ml import predict, PersonInfo
 from app.ml_2 import predicter
 import plotly.express as px
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
 import json
 from joblib import load
 import numpy as np
@@ -81,58 +83,59 @@ async def display_shap_predict(guest_info: PersonInfo):
 
    #Gets figure
    fig = shap_predict(encoder.transform(X), model['classifier'])
-   #Transforms to pickle
-   imdata = pickle.dumps(fig)
-   #transforms pickle to json
-   jstr = json.dumps({"image": base64.b64encode(imdata).decode('ascii')})
-   return jstr
+   return fig.to_json()
 
 def shap_predict(row, model, num_features=5):
-      # TODO: Add db_manager to this so we can
-      # easily get the df row. (might have to be inside of the main function.)
     pred = model.predict(row)[0]
+
     pred_index = np.where(model.classes_ == pred)[0][0]
+
     explainer = shap.TreeExplainer(model)
     shap_values = explainer.shap_values(row)
 
-    #return shap_values
     feature_names = row.columns
     feature_values = row.values[0]
+
     shaps = pd.Series(shap_values[pred_index][0], zip(feature_names, feature_values))
     shaps = shaps.sort_values(ascending=False)
 
     #Shows the confidence levels of each prediction
     confidences = [abs(sum(i[0])) for i in shap_values]
+
     result = shaps.to_string()
     contributing_n_features = shaps[:num_features]
     opposing_n_features = shaps[-num_features:]
+
     shap_summary = {'model_prediction':pred[0],
                      'prediction_confidence_percent':confidences[pred_index]/sum(confidences),
                      'contributing_n_features':contributing_n_features,
                      'opposing_n_features':opposing_n_features}
-    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(20, 10))
-    fig.suptitle("Model's Predicted Endpoint: 'Permanent Housing'" , fontsize=16)
+
+    fig = make_subplots(
+        rows=1, cols=2,
+        horizontal_spacing = 0.4,
+        column_titles=[],
+        specs=[[{}, {}]],
+        subplot_titles=("Features Supporting {}".format(pred[0]), "Features Opposing {}".format(pred[0])))
+
     y_pos = range(len(shap_summary['contributing_n_features']))
     features = shap_summary['contributing_n_features'][::-1].keys()
+    features = [feature[0] + ': ' + str(feature[1]) for feature in features]
     values = shap_summary['contributing_n_features'][::-1].values
+
     maxes = []
     maxes.append(max(values))
-    ax[0].barh(y_pos, values)
-    ax[0].set_xlabel("Confidence")
-    ax[0].set_yticks(y_pos)
-    ax[0].set_yticklabels(features)
-    ax[0].set_title("Features supporting Permanent Housing")
+
+    fig.add_trace(go.Bar(x=values, y=features, orientation='h', name="Supporting Features"), row=1, col=1)
+
     y_pos = range(len(shap_summary['opposing_n_features']))
     features = shap_summary['opposing_n_features'].keys()
+    features = [feature[0] + ': ' + str(feature[1]) for feature in features]
     values = abs(shap_summary['opposing_n_features'].values)
-    maxes.append(max(values))
-    ax[1].barh(y_pos, values, color='red')
-    ax[1].set_xlabel("Confidence")
-    ax[1].set_yticks(y_pos)
-    ax[1].set_yticklabels(features)
-    ax[1].set_title("Features opposing Permanent Housing")
-    ax[0].set_xlim(0, max(maxes) + 1)
-    ax[1].set_xlim(0, max(maxes) + 1)
-    plt.tight_layout()
 
+    fig.add_trace(go.Bar(x=values, y=features, orientation='h', name="Opposing Features"), row=1, col=2)
+
+    fig.update_xaxes(range=[0,max(maxes)], dtick=.2)
+    fig.update_layout(title_text="Predicted Exit: {}".format(pred[0]), title_x=0.5)
+    fig.update_layout(width=1400, height=500, template='plotly_white')
     return fig
