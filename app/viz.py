@@ -18,7 +18,7 @@ import pandas as pd
 
 router = APIRouter()
 
-@router.post('/Visualizations/{guest_info}')
+@router.post('/Visualizations')
 async def show_viz(guest_info: int):
    # load the 
    get_feats = predicter(guest_info)
