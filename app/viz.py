@@ -92,37 +92,36 @@ async def display(guest_info: int):
    
    return fig_list
 
-@router.get('/Shap_predict/{guest_info}')
+@router.get('/Shap_predict')
 async def display_shap_predict(guest_info: int):
    # load the
    get_feats = predicter(guest_info)
+
    # Loading the pickled model
    model = load('app/assets/randomforest_modelv3.pkl')
+
    results = db_manager.set_variables(guest_info)
+
    # Loads the pickled Model
    model = load('app/assets/randomforest_modelv3.pkl') #loads pickled model (using loblib)
+
    # Converts the dictionary to dataframe
    X = pd.DataFrame(results)
+
    # Renames the columns to the column names needed for the model.
    X.rename(columns={'case_members':'CaseMembers', 'race':'Race', 'ethnicity':'Ethnicity',
                      'current_age':'Current Age', 'gender':'Gender','length_of_stay':'Length of Stay',
                      'enrollment_length':'Days Enrolled in Project', 'household_type':'Household Type',
                      'barrier_count_entry':'Barrier Count at Entry'},inplace=True)
+
    encoder = model.named_steps['ord']
    encoded_columns = encoder.transform(X).columns
 
    #Gets figure
    fig = shap_predict(encoder.transform(X), model['classifier'])
-   #Transforms to pickle
-   imdata = pickle.dumps(fig)
-   #transforms pickle to json
-   jstr = json.dumps({"image": base64.b64encode(imdata).decode('ascii')})
-   return jstr
    return fig.to_json()
 
 def shap_predict(row, model, num_features=5):
-      # TODO: Add db_manager to this so we can
-      # easily get the df row. (might have to be inside of the main function.)
     pred = model.predict(row)[0]
 
     pred_index = np.where(model.classes_ == pred)[0][0]
@@ -130,7 +129,6 @@ def shap_predict(row, model, num_features=5):
     explainer = shap.TreeExplainer(model)
     shap_values = explainer.shap_values(row)
 
-    #return shap_values
     feature_names = row.columns
     feature_values = row.values[0]
 
@@ -148,8 +146,6 @@ def shap_predict(row, model, num_features=5):
                      'prediction_confidence_percent':confidences[pred_index]/sum(confidences),
                      'contributing_n_features':contributing_n_features,
                      'opposing_n_features':opposing_n_features}
-    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(20, 10))
-    fig.suptitle("Model's Predicted Endpoint: 'Permanent Housing'" , fontsize=16)
 
     fig = make_subplots(
         rows=1, cols=2,
@@ -165,11 +161,6 @@ def shap_predict(row, model, num_features=5):
 
     maxes = []
     maxes.append(max(values))
-    ax[0].barh(y_pos, values)
-    ax[0].set_xlabel("Confidence")
-    ax[0].set_yticks(y_pos)
-    ax[0].set_yticklabels(features)
-    ax[0].set_title("Features supporting Permanent Housing")
 
     fig.add_trace(go.Bar(x=values, y=features, orientation='h', name="Supporting Features"), row=1, col=1)
 
@@ -177,15 +168,6 @@ def shap_predict(row, model, num_features=5):
     features = shap_summary['opposing_n_features'].keys()
     features = [feature[0] + ': ' + str(feature[1]) for feature in features]
     values = abs(shap_summary['opposing_n_features'].values)
-    maxes.append(max(values))
-    ax[1].barh(y_pos, values, color='red')
-    ax[1].set_xlabel("Confidence")
-    ax[1].set_yticks(y_pos)
-    ax[1].set_yticklabels(features)
-    ax[1].set_title("Features opposing Permanent Housing")
-    ax[0].set_xlim(0, max(maxes) + 1)
-    ax[1].set_xlim(0, max(maxes) + 1)
-    plt.tight_layout()
 
     fig.add_trace(go.Bar(x=values, y=features, orientation='h', name="Opposing Features"), row=1, col=2)
 
