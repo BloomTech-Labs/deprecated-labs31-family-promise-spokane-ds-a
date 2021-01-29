@@ -22,6 +22,7 @@ category-encoders = "*"
 joblib = "*"
 psycopg2-binary = "*"
 shap = "*"
+plotly = "*"
 
 [requires]
 python_version = "3"
