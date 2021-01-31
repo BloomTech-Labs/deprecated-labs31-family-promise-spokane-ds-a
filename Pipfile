@@ -15,12 +15,12 @@ pandas = "*"
 jupyter = "*"
 jupyterlab = "*"
 matplotlib = "*"
-plotly-express = "*"
 seaborn = "*"
 scikit-learn = "*"
 category-encoders = "*"
 joblib = "*"
 psycopg2-binary = "*"
+shap = "*"
 plotly = "*"
 
 [requires]
