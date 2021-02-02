@@ -21,14 +21,13 @@ scikit-learn = "*"
 category-encoders = "*"
 joblib = "*"
 psycopg2-binary = "*"
-
+shap = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+plotly = "*"
+click = "*"
 
 [requires]
 python_version = "3"
-
-[packages.uvicorn]
-extras = [ "standard",]
-version = "*"
 
 [packages.pandas-profiling]
 extras = [ "notebook",]
