@@ -24,7 +24,6 @@ psycopg2-binary = "*"
 shap = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 plotly = "*"
-click = "*"
 
 [requires]
 python_version = "3"
