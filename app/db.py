@@ -1,41 +1,36 @@
-"""Database functions
-   This file came from the scaffold template. Not used. left it for future cohort."""
+"""Functions for initiating database connection and making various queries."""
 
 import os
-
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends
-import sqlalchemy
 
-router = APIRouter()
+from sqlalchemy import create_engine
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.orm import sessionmaker, Session
 
+load_dotenv()
+SQLALCHEMY_DB_URL = os.getenv('DATABASE_URL')
+engine = create_engine(SQLALCHEMY_DB_URL)
 
-async def get_db() -> sqlalchemy.engine.base.Connection:
-    """Get a SQLAlchemy database connection.
-    
-    Uses this environment variable if it exists:  
-    DATABASE_URL=dialect://user:password@host/dbname
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-    Otherwise uses a SQLite database for initial local development.
-    """
-    load_dotenv()
-    database_url = os.getenv('DATABASE_URL', default='sqlite:///temporary.db')
-    engine = sqlalchemy.create_engine(database_url)
-    connection = engine.connect()
+async def get_db():
+    db = SessionLocal()
     try:
-        yield connection
+        yield db
     finally:
-        connection.close()
+        db.close()
 
-# Not used. commented out to not be shown on front page of api
-# @router.get('/info')
-# async def get_url(connection=Depends(get_db)):
-#     """Verify we can connect to the database, 
-#     and return the database URL in this format:
 
-#     dialect://user:password@host/dbname
+# Build models from existing tables
 
-#     The password will be hidden with ***
-#     """
-#     url_without_password = repr(connection.engine.url)
-#     return {'database_url': url_without_password}
+Base = automap_base()
+Base.prepare(engine, reflect=True)
+
+Member = Base.classes.members
+Family = Base.classes.families
+
+def get_member(db: Session, id: int):
+    return db.query(Member).filter(Member.id == id).first()
+
+def get_family(db: Session, id: int):
+    return db.query(Family).filter(Family.id == id).first()
