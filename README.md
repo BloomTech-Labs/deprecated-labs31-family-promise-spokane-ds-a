@@ -1,6 +1,5 @@
 # Family Promise of Spokane
 
-Test
 
 You can find the deployed project at [Family Promise of Spokane](https://family-profile-styling-emily.d3hmwb1bmjh3u1.amplifyapp.com//).
 
