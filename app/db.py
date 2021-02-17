@@ -28,9 +28,3 @@ Base.prepare(engine, reflect=True)
 
 Member = Base.classes.members
 Family = Base.classes.families
-
-def get_member(db: Session, id: int):
-    return db.query(Member).filter(Member.id == id).first()
-
-def get_family(db: Session, id: int):
-    return db.query(Family).filter(Family.id == id).first()

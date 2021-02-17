@@ -2,10 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-from . import db, ml, viz, records
+from . import predict, records, visualize
 
 description = """
-Edit your app's title and description. See [https://fastapi.tiangolo.com/tutorial/metadata/](https://fastapi.tiangolo.com/tutorial/metadata/)
+An API for accessing predictive data and visualizations for [Family Promise of Spokane]\
+(https://www.familypromiseofspokane.org).
 
 To use these interactive docs:
 - Click on an endpoint below
@@ -22,8 +23,8 @@ app = FastAPI(
 )
 
 app.include_router(records.router, tags=['Database'])
-app.include_router(ml.router, tags=['Machine Learning'])
-app.include_router(viz.router, tags=['Visualization'])
+app.include_router(predict.router, tags=['Machine Learning'])
+app.include_router(visualize.router, tags=['Visualization'])
 
 app.add_middleware(
     CORSMiddleware,
