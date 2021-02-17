@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.automap import automap_base
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker
 
 load_dotenv()
 SQLALCHEMY_DB_URL = os.getenv('DATABASE_URL')
