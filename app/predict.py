@@ -1,17 +1,26 @@
 """Machine learning routes/functions"""
 
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from .db import get_db, Member, Family
 
 router = APIRouter()
 
 
+class PredResponse(BaseModel):
+    """Internal validation to ensure pipeline returns correct dtypes.
+    """
+    member_id: int
+    prediction: str
+    details: str
 
-@router.get("/predict-exit/{id}")
+
+
+@router.get("/predict-exit/{id}", response_model=PredResponse)
 async def exit_prediction(id: int, session: Session=Depends(get_db)):
     """Takes member ID, gets 'member' and 'family' objects from DB, and calls
-    prediction pipeline. Returns prediction.
+    prediction pipeline. Returns prediction object.
     """
     db_member = session.query(Member).filter(Member.id==id).first()
     if db_member is None:
@@ -29,8 +38,14 @@ def fake_predict(member, family):
     """
     if family.vehicle['make'] == 'BMW':
         if member.barriers['alcohol_abuse']:
-            return 'Permanent'
+            prediction = 'Permanent'
         else:
-            return 'Unknown'
+            prediction = 'Unknown'
     else:
-        return 'Temporary'
+        prediction = 'Temporary'
+    details = f'Explanation of {prediction}'[::-1]
+
+    # Retain this return format. 'prediction' and 'details' must be strings.
+    return {'member_id':member.id,
+            'prediction':prediction,
+            'details':details}

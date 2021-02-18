@@ -17,7 +17,7 @@ To use these interactive docs:
 """
 
 app = FastAPI(
-    title='DS API',
+    title='DS API - Family Promise',
     description=description,
     docs_url='/',
 )
