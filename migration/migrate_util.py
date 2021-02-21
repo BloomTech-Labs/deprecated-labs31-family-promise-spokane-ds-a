@@ -20,7 +20,7 @@ def _compile_drop_table(element, compiler, **kwargs):
 
 load_dotenv()
 SQLALCHEMY_DB_URL = os.getenv('DATABASE_URL')
-engine = create_engine(SQLALCHEMY_DB_URL)
+engine = create_engine(SQLALCHEMY_DB_URL, connect_args={"check_same_thread": False})
 
 
 # Create an instance of this for every db session
