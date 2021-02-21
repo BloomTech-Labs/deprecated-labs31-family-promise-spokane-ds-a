@@ -12,7 +12,7 @@ import pandas as pd
 router = APIRouter()
 
 
-# pipeline = joblib.load('tree3.ser')
+pipeline = joblib.load('tree3.ser')
 # pipeline = pickle.load(open('tree_pipeline3.pickle', 'rb'))
 
 
