@@ -11,7 +11,7 @@ import pandas as pd
 router = APIRouter()
 
 
-pipeline = joblib.load('tree3.ser')
+# pipeline = joblib.load('tree3.ser')
 
 
 class PredResponse(BaseModel):
@@ -52,7 +52,8 @@ def exit_predict(member, family):
 
     norm = norm.drop(columns=['predicted_exit_destination', '_sa_instance_state'])
 
-    return pipeline.predict(norm)[0]
+    return 'dead'
+    # return pipeline.predict(norm)[0]
 
 
 
