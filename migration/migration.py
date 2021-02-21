@@ -1,10 +1,20 @@
+"""Approximate migration of historical data into a temp database. Kept
+separate from actual web app database to avoid messing with web team as they
+update the structure.
+
+Create a .env file with DATABASE_URL="sqlite:///temp.db", then run this file.
+Also works when connected to a remote Postgres db, for testing on AWS.
+"""
+
 
 from sqlalchemy.exc import DataError
 
 import pandas as pd
-from migrate_util import SessionLocal, Member, Family
+from .migrate_util import SessionLocal, Member, Family
 
 
+# JSON cannot store NaNs, so these columns must be singled out and filled with 
+# appropriate values.
 JSON_STR_COLS = [
     '3.917 Homeless Start Date', '4.4 Covered by Health Insurance',
     '4.11 Domestic Violence - Currently Fleeing DV?', '3.6 Gender',
@@ -14,15 +24,21 @@ JSON_STR_COLS = [
     '4.08 HIV/AIDS', '4.09 Mental Health Problem', '4.05 Physical Disability',
     'R5 School Status'
 ]
+JSON_NUM_COLS = [
+    '4.2 Income Total at Entry'
+]
 
 
 if __name__ == '__main__':
     print('reading csv...')
     df = pd.read_csv('All_data_with_exits.csv', parse_dates=['3.10 Enroll Date', '3.11 Exit Date'])
-    df['4.2 Income Total at Entry'] = df['4.2 Income Total at Entry'].fillna(-1)
-    df[JSON_STR_COLS] = df[JSON_STR_COLS].fillna('')
+
 
     print('wrangling...')
+    df[JSON_NUM_COLS] = df[JSON_NUM_COLS].fillna(-1)
+    df[JSON_STR_COLS] = df[JSON_STR_COLS].fillna('')
+
+    # Look only at HoHs for family data.
     heads = df[df['3.15 Relationship to HoH'] == 'Self']
 
 
@@ -50,9 +66,11 @@ if __name__ == '__main__':
     for idx in df.index:
         row = df.loc[idx]
         mem_id = int(row['5.8 Personal ID'])
+
+        # Check if id already exists (there are id repeats in historical data).
         if not db.query(Member).filter(Member.id==mem_id).first():
             member = Member(
-                id = int(row['5.8 Personal ID']),
+                id = mem_id,
                 date_of_enrollment = row['3.10 Enroll Date'],
                 household_type = row['Household Type'],
                 length_of_stay = (row['3.11 Exit Date'] - row['3.10 Enroll Date']).days,
@@ -80,6 +98,11 @@ if __name__ == '__main__':
             family = db.query(Family).filter(Family.id==int(row['5.9 Household ID'])).first()
             if family:
                 family.members.append(member)
+
+            # Postgres throws a weird error about integers being too big, even though
+            # none of the integer values in this data are above 150,000. Since this is
+            # only a test migration I simply ignored those member rows which threw the 
+            # error.
             try:
                 db.commit()
             except DataError:

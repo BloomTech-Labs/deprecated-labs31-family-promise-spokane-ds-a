@@ -1,3 +1,13 @@
+"""Database connection and models intended to *mostly* mirror the actual web
+app database structure. As that structure is prone to change, I built this in
+order to get a head start without messing with the web team. 
+
+All columns from actual structure (in its last observed state) are listed, but
+some are commented out if there was no obvious parallel in the historical data.
+
+See migration.py for implementation.
+"""
+
 
 import os
 from dotenv import load_dotenv
