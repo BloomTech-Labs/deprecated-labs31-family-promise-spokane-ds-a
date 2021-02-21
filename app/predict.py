@@ -6,10 +6,11 @@ from sqlalchemy.orm import Session
 from .db import get_db, Member, Family
 
 import pandas as pd
+import pickle
 
 router = APIRouter()
 
-
+pipeline = pickle.load(open('tree3.pickle', 'rb'))
 
 class PredResponse(BaseModel):
     """Internal validation to ensure pipeline returns correct dtypes.
@@ -49,8 +50,7 @@ def exit_predict(member, family):
 
     norm = norm.drop(columns=['predicted_exit_destination', '_sa_instance_state'])
 
-    return 'dead'
-    # return pipeline.predict(norm)[0]
+    return pipeline.predict(norm)[0]
 
 
 
