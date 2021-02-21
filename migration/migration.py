@@ -4,6 +4,12 @@ update the structure.
 
 Create a .env file with DATABASE_URL="sqlite:///temp.db", then run this file.
 Also works when connected to a remote Postgres db, for testing on AWS.
+
+NOTE I occasionally got a sqlite error:
+'sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) attempt to write a 
+readonly database'
+This seemed to happen randomly and usually if I tried again the migration would
+succeed.
 """
 
 
@@ -60,9 +66,11 @@ if __name__ == '__main__':
         )
         db.add(family)
         db.commit()
+    db.close()
 
 
     print('migrating members...')
+    db = SessionLocal()
     for idx in df.index:
         row = df.loc[idx]
         mem_id = int(row['5.8 Personal ID'])
@@ -111,5 +119,7 @@ if __name__ == '__main__':
     db.close()
 
     print('done!')
+    db = SessionLocal()
     print(db.query(Family).count(), 'families.')
     print(db.query(Member).count(), 'members.')
+    db.close()
