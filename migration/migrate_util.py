@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
 
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, BigInteger
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, BigInteger, JSON
 from sqlalchemy.dialects.postgresql import JSONB
 
 
@@ -38,9 +38,9 @@ class Member(Base):
     date_of_enrollment = Column(Date)
     household_type = Column(String)
     length_of_stay = Column(Integer)    ## Existing is string
-    demographics = Column(JSONB)
-    barriers = Column(JSONB)
-    schools = Column(JSONB)
+    demographics = Column(JSON)
+    barriers = Column(JSON)
+    schools = Column(JSON)
     case_members = Column(Integer)
     predicted_exit_destination = Column(String)
     # flag = Column(String)
@@ -62,10 +62,10 @@ class Family(Base):
     # emergencyContact = Column(JSON)
     # vehicle = Column(JSON)
     # last_permanent_address = Column(String)
-    homeless_info = Column(JSONB)
+    homeless_info = Column(JSON)
     # gov_benefits = Column(JSON)
-    insurance = Column(JSONB)
-    domestic_violence_info = Column(JSONB)
+    insurance = Column(JSON)
+    domestic_violence_info = Column(JSON)
     # pets = Column(JSON)
     # avatar_url = Column(String)
     # percent_complete = Column(Integer)
