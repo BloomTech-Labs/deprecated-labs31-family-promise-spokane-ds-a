@@ -12,6 +12,7 @@ import pandas as pd
 router = APIRouter()
 
 
+df = pickle.load(open('train_df.pickle', 'rb'))
 
 # pipeline = joblib.load('tree3.ser')
 # pipeline = pickle.load(open('tree_pipeline3.pickle', 'rb'))
