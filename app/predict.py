@@ -6,12 +6,14 @@ from sqlalchemy.orm import Session
 from .db import get_db, Member, Family
 
 import joblib
+import pickle
 import pandas as pd
 
 router = APIRouter()
 
 
 # pipeline = joblib.load('tree3.ser')
+pipeline = pickle.load(open('tree_pipeline3.pickle', 'rb'))
 
 
 class PredResponse(BaseModel):
