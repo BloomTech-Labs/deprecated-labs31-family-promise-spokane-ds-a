@@ -2,21 +2,16 @@
 separate from actual web app database to avoid messing with web team as they
 update the structure.
 
-Create a .env file with DATABASE_URL="sqlite:///temp.db", then run this file.
-Also works when connected to a remote Postgres db, for testing on AWS.
+Use caution as this will overwrite any database you connect it to!
 
-NOTE I occasionally got a sqlite error:
-'sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) attempt to write a 
-readonly database'
-This seemed to happen randomly and usually if I tried again the migration would
-succeed.
+First put database url in .env as DATABASE_URL.
 """
 
 
 from sqlalchemy.exc import DataError
 
 import pandas as pd
-from migrate_util import SessionLocal, Member, Family
+from migrate_util import SessionLocal, Member, Family, EXIT_DICT
 
 
 # JSON cannot store NaNs, so these columns must be singled out and filled with 
@@ -28,10 +23,10 @@ JSON_STR_COLS = [
     '4.10 Alcohol Abuse (Substance Abuse)', '4.06 Developmental Disability',
     '4.07 Chronic Health Condition', '4.10 Drug Abuse (Substance Abuse)',
     '4.08 HIV/AIDS', '4.09 Mental Health Problem', '4.05 Physical Disability',
-    'R5 School Status'
+    'R5 School Status', '3.12 Exit Destination'
 ]
 JSON_NUM_COLS = [
-    '4.2 Income Total at Entry'
+    '4.2 Income Total at Entry', '4.2 Income Total at Exit'
 ]
 
 
@@ -66,11 +61,9 @@ if __name__ == '__main__':
         )
         db.add(family)
         db.commit()
-    db.close()
 
 
     print('migrating members...')
-    db = SessionLocal()
     for idx in df.index:
         row = df.loc[idx]
         mem_id = int(row['5.8 Personal ID'])
@@ -101,7 +94,10 @@ if __name__ == '__main__':
                 schools = {
                     'enrolled_status':row['R5 School Status'],
                 },
-                case_members = int(row['CaseMembers'])
+                case_members = int(row['CaseMembers']),
+                date_of_exit = row['3.11 Exit Date'],
+                income_at_exit = float(row['4.2 Income Total at Exit']),
+                exit_destination = EXIT_DICT[row['3.12 Exit Destination']]
             )
             family = db.query(Family).filter(Family.id==int(row['5.9 Household ID'])).first()
             if family:
@@ -116,10 +112,8 @@ if __name__ == '__main__':
             except DataError:
                 db.rollback()
                 print('DataError on', mem_id)
-    db.close()
 
     print('done!')
-    db = SessionLocal()
     print(db.query(Family).count(), 'families.')
     print(db.query(Member).count(), 'members.')
     db.close()
