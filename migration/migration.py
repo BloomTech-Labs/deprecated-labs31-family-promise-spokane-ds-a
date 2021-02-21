@@ -10,7 +10,7 @@ Also works when connected to a remote Postgres db, for testing on AWS.
 from sqlalchemy.exc import DataError
 
 import pandas as pd
-from .migrate_util import SessionLocal, Member, Family
+from migrate_util import SessionLocal, Member, Family
 
 
 # JSON cannot store NaNs, so these columns must be singled out and filled with 

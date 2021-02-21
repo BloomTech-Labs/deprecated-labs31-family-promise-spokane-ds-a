@@ -32,13 +32,10 @@ load_dotenv()
 SQLALCHEMY_DB_URL = os.getenv('DATABASE_URL')
 engine = create_engine(SQLALCHEMY_DB_URL, connect_args={"check_same_thread": False})
 
-
-# Create an instance of this for every db session
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-
-
 Base = declarative_base()
+
 
 class Member(Base):
     __tablename__ = 'members'
