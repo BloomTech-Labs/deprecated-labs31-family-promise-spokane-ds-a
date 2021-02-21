@@ -5,17 +5,10 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from .db import get_db, Member, Family
 
-import joblib
-import pickle
 import pandas as pd
 
 router = APIRouter()
 
-
-df = pickle.load(open('train_df.pickle', 'rb'))
-
-# pipeline = joblib.load('tree3.ser')
-# pipeline = pickle.load(open('tree_pipeline3.pickle', 'rb'))
 
 
 class PredResponse(BaseModel):
