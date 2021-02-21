@@ -10,7 +10,6 @@ import pickle
 
 router = APIRouter()
 
-# Make SURE Dockerfile is copying your pickled model.
 PIPELINE = pickle.load(open('app/models/tree3.pickle', 'rb'))
 
 
