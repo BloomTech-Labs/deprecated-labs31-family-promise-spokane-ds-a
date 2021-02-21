@@ -10,7 +10,10 @@ import pickle
 
 router = APIRouter()
 
-pipeline = pickle.load(open('tree3.pickle', 'rb'))
+# Make SURE Dockerfile is copying your pickled model.
+PIPELINE = pickle.load(open('tree3.pickle', 'rb'))
+
+
 
 class PredResponse(BaseModel):
     """Internal validation to ensure pipeline returns correct dtypes.
@@ -22,8 +25,8 @@ class PredResponse(BaseModel):
 
 @router.get("/predict-exit/{id}", response_model=PredResponse)
 async def exit_prediction(id: int, session: Session=Depends(get_db)):
-    """Takes member ID, gets 'member' and 'family' objects from DB, and calls
-    prediction pipeline. Returns prediction object.
+    """Takes member ID and returns prediction. Also updates 'predicted_exit_destination'
+    column in the database.
     """
     db_member = session.query(Member).filter(Member.id==id).first()
     if db_member is None:
@@ -46,18 +49,20 @@ def exit_predict(member, family):
     norm['date_of_enrollment'] = pd.to_datetime(norm['date_of_enrollment'])
     norm['homeless_info.homeless_start_date'] = pd.to_datetime(norm['homeless_info.homeless_start_date'])
 
-    norm = _wrangle(norm)
+    norm = _feat_engineer(norm)
 
+    # Drop target, as well as '_sa_instance_state', which is part of the sqlalchemy
+    # model object.
     norm = norm.drop(columns=['predicted_exit_destination', '_sa_instance_state'])
 
-    return pipeline.predict(norm)[0]
+    return PIPELINE.predict(norm)[0]
 
 
 
 
-def _wrangle(df):
-    """This wrangle function MUST be identical to whatever you are using
-    in your model notebook.
+def _feat_engineer(df):
+    """This function should be identical to whatever feature engineering is going
+    on in your model notebook.
     """
     df = df.copy()
     df['homeless_start_year'] = df['homeless_info.homeless_start_date'].dt.year
