@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 # pipeline = joblib.load('tree3.ser')
-pipeline = pickle.load(open('tree_pipeline3.pickle', 'rb'))
+# pipeline = pickle.load(open('tree_pipeline3.pickle', 'rb'))
 
 
 class PredResponse(BaseModel):
