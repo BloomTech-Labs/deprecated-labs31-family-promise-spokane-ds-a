@@ -100,7 +100,7 @@ def plot_moving_avg(session, m, days_back):
             'Unknown/Other']}
         )
 
-    return fig.to_json()
+    return fig
 
 
 
@@ -113,11 +113,16 @@ def plot_exit_pie(session, m):
     df['count'] = 1
 
     fig = px.pie(
-        df, values='count', names='dest'
+        df, values='count', color='dest', names='dest',
+        color_discrete_map={
+            'Permanent Exit':'#636EFA',
+            'Temporary Exit':'#EF553B',
+            'Transitional Housing':'#00CC96',
+            'Emergency Shelter':'#AB63FA',
+            'Unknown/Other':'#FFA15A'}
         )
 
-    return fig.to_json()
-
+    return fig
 
 
 
