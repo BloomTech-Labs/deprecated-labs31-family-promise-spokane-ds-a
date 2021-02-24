@@ -54,6 +54,9 @@ def exit_predict(member, family):
     # model object.
     norm = norm.drop(columns=['predicted_exit_destination', '_sa_instance_state'])
 
+    # Drop KPI columns.
+    norm = norm.drop(columns=['date_of_exit', 'income_at_exit', 'exit_destination'])
+
     return PIPELINE.predict(norm)[0]
 
 
