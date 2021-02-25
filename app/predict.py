@@ -1,7 +1,6 @@
-"""Machine learning routes/functions"""
+"""Prediction routes/functions."""
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from .db import get_db, Member, Family
 
@@ -13,19 +12,14 @@ router = APIRouter()
 PIPELINE = pickle.load(open('app/models/tree3.pickle', 'rb'))
 
 
+### ROUTES ###
 
-class PredResponse(BaseModel):
-    """Internal validation to ensure pipeline returns correct dtypes.
-    """
-    member_id: int
-    exit_prediction: str
-
-
-
-@router.get("/predict-exit/{id}", response_model=PredResponse)
+@router.get("/predict-exit/{id}")
 async def exit_prediction(id: int, session: Session=Depends(get_db)):
-    """Takes member ID and returns prediction. Also updates 'predicted_exit_destination'
-    column in the database.
+    """Updates and returns exit prediction for given member ID.
+
+    Path Parameters:
+    - id (int) : Member ID.
     """
     db_member = session.query(Member).filter(Member.id==id).first()
     if db_member is None:
@@ -40,6 +34,7 @@ async def exit_prediction(id: int, session: Session=Depends(get_db)):
             'exit_prediction':db_member.predicted_exit_destination}
 
 
+### FUNCTIONS ###
 
 def exit_predict(member, family):
     """A fully functional prediction pipeline, using a TERRIBLE model! 
@@ -58,7 +53,6 @@ def exit_predict(member, family):
     norm = norm.drop(columns=['date_of_exit', 'income_at_exit', 'exit_destination'])
 
     return PIPELINE.predict(norm)[0]
-
 
 
 

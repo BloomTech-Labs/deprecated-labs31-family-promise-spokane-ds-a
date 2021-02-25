@@ -1,3 +1,5 @@
+"""Main app file."""
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -17,15 +19,17 @@ To use these interactive docs:
 """
 
 app = FastAPI(
-    title='DS API',
+    title='Family Promise - DS API',
     description=description,
     docs_url='/',
 )
 
-app.include_router(records.router, tags=['Database'])
-app.include_router(predict.router, tags=['Machine Learning'])
-app.include_router(visualize.router, tags=['Visualization'])
+app.include_router(predict.router, tags=['Predictions'])
+app.include_router(visualize.router, tags=['Visualizations'])
+app.include_router(records.router, tags=['Records'])
 
+
+# TODO - Incorporate this! API should not be publicly accessible.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],

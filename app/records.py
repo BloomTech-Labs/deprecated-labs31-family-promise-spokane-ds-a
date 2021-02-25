@@ -1,4 +1,4 @@
-"""Simple GET endpoints for reading 'member' and 'family' records."""
+"""Simple GET routes for reading 'member' and 'family' records."""
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -7,10 +7,14 @@ from .db import get_db, Member, Family
 router = APIRouter()
 
 
+### ROUTES ###
 
 @router.get("/member/{id}")
 async def read_member(id: int, session: Session=Depends(get_db)):
-    """Takes member ID and returns member object from DB.
+    """Returns all member data for given member ID.
+
+    Path Parameters:
+    - id (int) : Member ID.
     """
     db_member = session.query(Member).filter(Member.id==id).first()
     if db_member is None:
@@ -18,10 +22,12 @@ async def read_member(id: int, session: Session=Depends(get_db)):
     return db_member
 
 
-
 @router.get("/family/{id}")
 async def read_family(id: int, session: Session=Depends(get_db)):
-    """Takes family ID and returns family object from DB.
+    """Returns all family data for given family ID.
+
+    Path Parameters:
+    - id (int) : Family ID.
     """
     db_family = session.query(Family).filter(Family.id==id).first()
     if db_family is None:
