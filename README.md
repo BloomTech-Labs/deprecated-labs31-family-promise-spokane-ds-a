@@ -1,5 +1,18 @@
 # Family Promise of Spokane
 
+# CURRENT STATE OF DS API (YES, ACTUALLY READ ME):
+
+MIGRATION. Be in touch with web about current database structure.
+
+Model workflow.
+- start with database structure
+- create clean dataframe with col names IDENTICAL to what json_normalize will create from database
+- any feature engineering must go in a function which can be called by the predict endpoint
+- sort columns
+- ideally train model from within venv (to maintain all package versions)
+
+
+
 
 You can find the deployed project at [Family Promise of Spokane](https://family-profile-styling-emily.d3hmwb1bmjh3u1.amplifyapp.com//).
 
@@ -41,7 +54,7 @@ The Family Promise of Spokane  Organization is a US-based nonprofit organization
 
 # Deployed Product
 [Front End Dashboard](https://family-profile-styling-emily.d3hmwb1bmjh3u1.amplifyapp.com/) |
-[Data Science API](http://a-labs29-family-promise.eba-syir5yx3.us-east-1.elasticbeanstalk.com/) |
+[Data Science API](http://fam-prom-the-end.eba-jknbh7ge.us-east-1.elasticbeanstalk.com) |
 [Back End API](https://family-pomise-spokane.herokuapp.com/) |
 
 # Linked Repositories
