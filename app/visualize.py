@@ -100,7 +100,7 @@ def plot_moving_avg(session, m, days_back):
             'Unknown/Other']}
         )
 
-    return fig
+    return fig.to_json()
 
 
 
@@ -122,7 +122,7 @@ def plot_exit_pie(session, m):
             'Unknown/Other':'#FFA15A'}
         )
 
-    return fig
+    return fig.to_json()
 
 
 
