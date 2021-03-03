@@ -14,7 +14,8 @@ from plotly.express.colors import qualitative as cmaps
 router = APIRouter()
 
 PLOT_CACHE_DIR = 'app/plotcache'
-
+ALLOWED_FEATS = ['DEST', 'INC', 'LEN']
+ALLOWED_M = [90, 365]
 
 
 ### ROUTES ###
@@ -187,13 +188,13 @@ def _exit_df(session, first, last):
         df = df.append({
             'Date':ex.date_of_exit,
             'Destination':ex.exit_destination,
-            'Income Category':_income_categories(ex.demographics['income'], ex.income_at_exit),
-            'Length Of Stay':_length_stay_categories(ex.date_of_enrollment, ex.date_of_exit)
+            'Income Category':_inc_categories(ex.demographics['income'], ex.income_at_exit),
+            'Length Of Stay':_len_categories(ex.date_of_enrollment, ex.date_of_exit)
         }, ignore_index=True)
     return df
 
 
-def _income_categories(inc_entry, inc_exit):
+def _inc_categories(inc_entry, inc_exit):
     """Returns an income category for given income-at-entry and income-at-exit.
     """
     if inc_exit > inc_entry:
@@ -206,7 +207,7 @@ def _income_categories(inc_entry, inc_exit):
         return 'No Change'
 
 
-def _length_stay_categories(date_enrollment, date_exit):
+def _len_categories(date_enrollment, date_exit):
     """Returns a length category for given date-of-enrollment and date-of-exit.
     """
     delta = (date_exit - date_enrollment).days
@@ -224,10 +225,10 @@ def _length_stay_categories(date_enrollment, date_exit):
 def _check_valid(feature, m):
     """Ensures valid values for path parameters.
     """
-    if not (feature=='DEST' or feature=='INC' or feature=='LEN'):
-        raise HTTPException(status_code=404, detail="Not found. Try feature = 'DEST', 'INC', or 'LEN'")
-    if not (m==90 or m==365):
-        raise HTTPException(status_code=404, detail="Not found. Try m = 90 or 365")
+    if feature not in ALLOWED_FEATS:
+        raise HTTPException(status_code=404, detail=f"Feature '{feature}' not found.")
+    if m not in ALLOWED_M:
+        raise HTTPException(status_code=404, detail=f"Not found. '{m}' is an invalid value for m.")
 
 
 def _DoY():
