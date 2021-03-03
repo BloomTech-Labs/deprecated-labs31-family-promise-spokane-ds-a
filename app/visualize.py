@@ -100,7 +100,7 @@ class Plotter:
         for i in range(0, days_back, STEP):
             end = last - timedelta(days=i)
             start = end - timedelta(days=m)
-            sub = df[(df['date'] > start) & (df['date'] <= end)]
+            sub = df[(df['Date'] > start) & (df['Date'] <= end)]
             n_exits = sub.shape[0]
 
             # 'breakdown' is the proportion of each category out of the total exits for
@@ -111,7 +111,7 @@ class Plotter:
 
         fig = px.line(
             moving, 
-            labels={'index':'date', 'value':'proportion'},
+            labels={'index':'Date', 'value':'proportion'},
             color_discrete_map=self.discrete_cmap
         )
         return fig.to_json()
