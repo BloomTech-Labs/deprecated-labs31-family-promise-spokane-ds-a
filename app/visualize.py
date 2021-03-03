@@ -21,7 +21,7 @@ PLOT_CACHE_DIR = 'app/plotcache'
 
 @router.get("/moving-avg-{feature}/{m}-{days_back}")
 async def moving_avg(
-    feature: str,           # 'DEST' or 'INC'
+    feature: str,           # 'DEST', 'INC', or 'LEN'
     m: int,                 # 90 or 365
     days_back: int,
     after: BackgroundTasks,
@@ -40,7 +40,7 @@ async def moving_avg(
 
 @router.get("/pie-{feature}/{m}")
 async def moving_avg(
-    feature: str,           # 'DEST' or 'INC'
+    feature: str,           # 'DEST', 'INC', or 'LEN'
     m: int,                 # 90 or 365
     after: BackgroundTasks,
     session: Session=Depends(get_db)):
@@ -112,7 +112,7 @@ class Plotter:
 
         fig = px.line(
             moving, 
-            labels={'index':'Date', 'value':'proportion'},
+            labels={'index':'Date', 'value':'Proportion', 'variable':'Category'},
             color_discrete_map=self.discrete_cmap
         )
         return fig.to_json()
@@ -145,6 +145,11 @@ inc_plots = Plotter(
     categories=['Increased', 'Decreased', 'No Change', 'NO DATA'],
     cmap=cmaps.T10
 )
+len_plots = Plotter(
+    feature='Length Of Stay',
+    categories=["<2 weeks", "2-9 weeks", ">2 months"],
+    cmap=cmaps.Dark2
+)
 
 
 # Dict so 'get_plot()' can select the correct Plotter method.
@@ -152,7 +157,9 @@ PLOT_FUNCS = {
     'DEST-MA':dest_plots.plot_moving,
     'DEST-PIE':dest_plots.plot_pie,
     'INC-MA':inc_plots.plot_moving,
-    'INC-PIE':inc_plots.plot_pie
+    'INC-PIE':inc_plots.plot_pie,
+    'LEN-MA':len_plots.plot_moving,
+    'LEN-PIE':len_plots.plot_pie
 }
 
 
@@ -180,7 +187,8 @@ def _exit_df(session, first, last):
         df = df.append({
             'Date':ex.date_of_exit,
             'Destination':ex.exit_destination,
-            'Income Category':_income_categories(ex.demographics['income'], ex.income_at_exit)
+            'Income Category':_income_categories(ex.demographics['income'], ex.income_at_exit),
+            'Length Of Stay':_length_stay_categories(ex.date_of_enrollment, ex.date_of_exit)
         }, ignore_index=True)
     return df
 
@@ -198,6 +206,17 @@ def _income_categories(inc_entry, inc_exit):
         return 'No Change'
 
 
+def _length_stay_categories(date_enrollment, date_exit):
+    """Returns a length category for given date-of-enrollment and date-of-exit.
+    """
+    delta = (date_exit - date_enrollment).days
+    if delta < 14:
+        return "<2 weeks"
+    elif delta >= 14 and delta < 62:
+        return "2-9 weeks"
+    elif delta >= 62:
+        return ">2 months"
+
 
 
 ### LOWER-LEVEL FUNCTIONS FOR ROUTES AND 'get_plot()' ###
@@ -205,9 +224,9 @@ def _income_categories(inc_entry, inc_exit):
 def _check_valid(feature, m):
     """Ensures valid values for path parameters.
     """
-    if not (feature == 'DEST' or feature == 'INC'):
-        raise HTTPException(status_code=404, detail="Not found. Try feature = 'DEST' or 'INC'")
-    if not (m == 90 or m == 365):
+    if not (feature=='DEST' or feature=='INC' or feature=='LEN'):
+        raise HTTPException(status_code=404, detail="Not found. Try feature = 'DEST', 'INC', or 'LEN'")
+    if not (m==90 or m==365):
         raise HTTPException(status_code=404, detail="Not found. Try m = 90 or 365")
 
 
