@@ -12,6 +12,7 @@ router = APIRouter()
 PIPELINE = pickle.load(open('app/models/tree3.pickle', 'rb'))
 
 
+
 ### ROUTES ###
 
 @router.get("/predict-exit/{id}")
@@ -32,6 +33,8 @@ async def exit_prediction(id: int, session: Session=Depends(get_db)):
 
     return {'member_id':db_member.id, 
             'exit_prediction':db_member.predicted_exit_destination}
+
+
 
 
 ### FUNCTIONS ###

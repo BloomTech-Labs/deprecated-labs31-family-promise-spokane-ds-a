@@ -12,6 +12,7 @@ import plotly.express as px
 from plotly.express.colors import qualitative as cmaps 
 
 router = APIRouter()
+
 PLOT_CACHE_DIR = 'app/plotcache'
 
 

@@ -14,12 +14,20 @@ Model workflow.
 
 
 
-You can find the deployed project at [Family Promise of Spokane](https://family-profile-styling-emily.d3hmwb1bmjh3u1.amplifyapp.com//).
+You can find the deployed project at [Family Promise of Spokane](https://a.familypromisesofspokane.dev/).
 
 # Description
 
 The Family Promise of Spokane  Organization is a US-based nonprofit organization based in Spokane, WA. They are an organization that helps homeless families as well as preventing families from becoming homeless. They provide shelter for families as well as rental assitance. For the full description visit their website [Family Promise of Spokane](https://www.familypromiseofspokane.org/)
+
 # Contributors
+
+| [Ben Somerville](https://github.com/bsmrvl) |
+| :---: |
+| [<img src="https://avatars.githubusercontent.com/u/70228881?s=400&u=05b1dfcb97cd62deaf5f2afacbd6c2372d945530&v=4" width='200' />](https://github.com/bsmrvl) |
+| Data Scientist |
+| [<img src="https://github.com/favicon.ico" width="15"> ](https://github.com/bsmrvl) |
+| [<img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/ben-somerville/) |
 
 | [Kristine Wang](https://github.com/KristineYW) | [Tyler Etheridge](https://github.com/tyleretheridge) | [Santiago Berniz](https://github.com/sberniz/) | [Leslie Rodriguez](https://github.com/thereactgirl) |
 | :---: | :---: | :---: | :---: | 
@@ -36,26 +44,24 @@ The Family Promise of Spokane  Organization is a US-based nonprofit organization
 | [ <img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/emily-huntwork/) | [ <img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/abdinajib-mohamud/) | [ <img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/isaiah-fowler/) |              
 
 <br>          
-
 <br>
 <br>
 
-![fastapi](https://img.shields.io/badge/fastapi-0.60.1-blue)
-![pandas](https://img.shields.io/badge/pandas-1.1.0-blueviolet)
+![fastapi](https://img.shields.io/badge/fastapi-0.62.0-blue)
+![pandas](https://img.shields.io/badge/pandas-1.1.5-blueviolet)
 
-![uvicorn](https://img.shields.io/badge/uvicorn-0.11.8-ff69b4)
-![python-dotenv](https://img.shields.io/badge/python--dotenv-0.14.0-green)
+![uvicorn](https://img.shields.io/badge/uvicorn-0.13.1-ff69b4)
+![psycopg2](https://img.shields.io/badge/psycopg2-2.8.6-informational)
+![sqlalchemy](https://img.shields.io/badge/sqlalchemy-1.3.21-green)
 
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-0.23.2-yellow)
-![psycopg2](https://img.shields.io/badge/psycopg2--2.8.6-informational)
-![fastapi-utils](https://img.shields.io/badge/fastapi--utils-0.2.1-informational)
-
+![plotly-express](https://img.shields.io/badge/plotly--express-0.4.1-informational)
 
 
 # Deployed Product
-[Front End Dashboard](https://family-profile-styling-emily.d3hmwb1bmjh3u1.amplifyapp.com/) |
+[Front End Dashboard](https://a.familypromisesofspokane.dev/) |
 [Data Science API](http://fam-prom-the-end.eba-jknbh7ge.us-east-1.elasticbeanstalk.com) |
-[Back End API](https://family-pomise-spokane.herokuapp.com/) |
+[Back End API](https://family-promise-a-be.herokuapp.com/) |
 
 # Linked Repositories
 [Family Promise of Spokane Back End](https://github.com/Lambda-School-Labs/family-promise-spokane-be-a) |
@@ -66,9 +72,9 @@ The Family Promise of Spokane  Organization is a US-based nonprofit organization
 
 ### User Flows
 
-[Trello Board](https://trello.com/b/FyWvcZzY/family-promise-of-spokane)
+[Trello Board](https://trello.com/b/NWATDZ3U/labs-31-family-promise-a)
 
-Our team is developing a digital intake form for families in Family Promise Shelter. This intake form is a replacement for the paper form currently being filled by guests of the shelter. All the Data is given by the guests. We have a multi-class random forest model that takes the guest data and predicts their exit destination. The possible Exit Destination are as follow. 
+Our team is developing a digital intake form for families in Family Promise Shelter. This intake form is a replacement for the paper form currently being filled by guests of the shelter. All the data is provided by the guests. We have a multi-class decision tree model which takes the guest data and predicts their exit destination. The possible exit destinations are as follows:
 - Permanent Exit
 - Temporary Exit
 - Emergency Shelter
@@ -83,19 +89,17 @@ Our team is developing a digital intake form for families in Family Promise Shel
 - Guest can be flagged for mis conduct
 - notes can be added to guest's profile. 
 - Guest can view their own profile. 
+
 ### Environment Variables
 
 In order for the app to function correctly, the user must set up their own environment variables. There should be a .env file containing the following:
 
-    *  DB_URL  - Postgres database credentials
-
+    DB_URL="POSTGRES_DATABASE_URL"
 
 
 ### Content Licenses
 
-| Image Filename | Source / Creator | License                                                                      |
-| -------------- | ---------------- | ---------------------------------------------------------------------------- |
-| Nopic.yet      | INSERT NAME      | [MIT](input githandle here)                             |
+[MIT License](https://github.com/Lambda-School-Labs/family-promise-spokane-ds-a/blob/main/LICENSE)
 
 ### Installation Instructions
 
