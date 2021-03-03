@@ -29,7 +29,7 @@ async def moving_avg(
     """Returns a lineplot (Plotly JSON) showing m-day moving averages of the given feature.
 
     Path Parameters:
-    - feature (str) : Feature to plot. Only accepts 'DEST' (exit destination) or 'INC' (income change).
+    - feature (str) : Feature to plot. Accepts 'DEST' (exit destination), 'INC' (income change), or 'LEN' (length of stay).
     - m (int) : Number of days considered in each moving average calculation. Only accepts 90 or 365.
     - days_back (int) : Date range to plot, in days prior to the present day.
     """
@@ -47,8 +47,8 @@ async def moving_avg(
     """Returns a piechart (Plotly JSON) of the given feature.
 
     Path Parameters:
-    - feature (str) : Feature to plot. Only accepts 'DEST' (exit destination) or 'INC' (income change).
-    - m (int) : Number of days considered in each moving average calculation. Only accepts 90 or 365.
+    - feature (str) : Feature to plot. Accepts 'DEST' (exit destination), 'INC' (income change), or 'LEN' (length of stay).
+    - m (int) : Number of days considered in the calculation. Only accepts 90 or 365.
     """
     _check_valid(feature, m)
     plot_id = f'{feature}-PIE'

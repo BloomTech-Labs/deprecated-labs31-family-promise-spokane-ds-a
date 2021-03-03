@@ -8,7 +8,7 @@ from . import predict, records, visualize
 
 description = """
 An API for accessing predictive data and visualizations for [Family Promise of Spokane]\
-(https://www.familypromiseofspokane.org).
+(https://a.familypromisesofspokane.dev/).
 
 To use these interactive docs:
 - Click on an endpoint below
