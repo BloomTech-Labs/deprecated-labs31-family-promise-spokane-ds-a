@@ -178,7 +178,7 @@ def _date_range(m, days_back=0):
 
 
 def _exit_df(session, first, last):
-    """Queries database for all members who exited in given date range, returning necessary data as a DataFrame.
+    """Queries database for all members who exited in given date range, returning a DataFrame.
     """
     exits = session.query(Member).filter((Member.date_of_exit > first)\
                 & (Member.date_of_exit <= last)).all()
