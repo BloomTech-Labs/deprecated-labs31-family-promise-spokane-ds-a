@@ -2,10 +2,10 @@
 See deployed API at [http://fam-prom-the-end.eba-jknbh7ge.us-east-1.elasticbeanstalk.com](http://fam-prom-the-end.eba-jknbh7ge.us-east-1.elasticbeanstalk.com)
 
 ## About Family Promise
-Family Promise of Spokane is a US nonprofit organization based in Spokane, WA. They are an organization that helps homeless families as well as preventing families from becoming homeless. They provide shelter for families as well as rental assitance. For the full description visit their website [Family Promise of Spokane](https://www.familypromiseofspokane.org/)
+Family Promise of Spokane is a U.S. nonprofit organization based in Spokane, WA. They help homeless families and work to prevent families from becoming homeless, providing shelter as well as rental assistance. For a full description visit their website: [Family Promise of Spokane](https://www.familypromiseofspokane.org/).
 
 # Current State of DS API (Please Actually Read Me)
-First of all, if any of the below is unclear, feel free to reach out to [Ben](https://github.com/bsmrvl). But please first read this section carefully! It's a project one has to be very slow and methodical about, or else totally waste their time. 
+First of all, if any of the below is unclear, feel free to reach out to [Ben](https://github.com/bsmrvl). But please first read this section carefully! This is a project one has to be very slow and methodical about, or else totally waste their time. 
 
 ## Todo Summary
 - Connect to official database
@@ -29,7 +29,7 @@ One function of the API is to predict where guests at the shelter will exit to, 
 - Unknown/Other
 
 We in Labs31 were told there was a model already trained for this purpose. However, it quickly became clear that those who created this model had fallen (understandably) into some very treacherous pits. These pits are:
-- The historical data provided for training has quite a different feature set from the database used by the web backend. Training on the whole dataset results in a model which can't actually be implemented.
+- The historical data provided for training has quite a different feature set from the database used by the web backend. Training on the whole dataset results in a model which can't actually be implemented. _**Compare 'Sample_data_color_coded.xlsx' with Web database, and update colors as needed.**_
 - Guests usually exit _as families_, so a random train-test-split which separates family members will cause leakage. The model will make predictions in the validation set based off where their family member (in the training set) is already known to have exited. This is made terribly clear when you do a time-based split, or limit the data to heads of households. The validation accuracy drops by about 20%.
 
 The solution to these dangers is **caution**. Unfortunately, caution sometimes produces poor metrics. The model currently implemented in the API boasts 45% cross-validation accuracy, and **one** feature (length_of_stay) has 100% of the feature importance. Of course, length_of_stay hardly exists as a feature when a guest first enrolls, so the already-scanty merits of this model are actually worthless until the guest is around for a few weeks. 
