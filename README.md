@@ -1,24 +1,48 @@
-# Family Promise of Spokane
+# Family Promise of Spokane - DS API
+See deployed API at [http://fam-prom-the-end.eba-jknbh7ge.us-east-1.elasticbeanstalk.com](http://fam-prom-the-end.eba-jknbh7ge.us-east-1.elasticbeanstalk.com)
 
-# CURRENT STATE OF DS API (YES, ACTUALLY READ ME):
+# About Family Promise
+Family Promise of Spokane is a US nonprofit organization based in Spokane, WA. They are an organization that helps homeless families as well as preventing families from becoming homeless. They provide shelter for families as well as rental assitance. For the full description visit their website [Family Promise of Spokane](https://www.familypromiseofspokane.org/)
 
-MIGRATION. Be in touch with web about current database structure.
+# Current State of DS API (Yes, Actually Read Me)
 
-Model workflow.
-- start with database structure
-- create clean dataframe with col names IDENTICAL to what json_normalize will create from database
-- any feature engineering must go in a function which can be called by the predict endpoint
-- sort columns
-- ideally train model from within venv (to maintain all package versions)
-
+###### DISCUSS
+CORS
+Prediction interpretations
 
 
+## Database
+The API currently accesses a development database which contains historical data from August 2020 and earlier. It only partially corresponds with the structure of the database used by the web backend, which will eventually be the official database which this API needs to access. The reason for creating this development database was that we foresaw imminent changes to the web database and saw no sense in building an API on shifting ground.
 
-You can find the deployed project at [Family Promise of Spokane](https://a.familypromisesofspokane.dev/).
+Looking forward, DS must work _**very**_ closely with Web in order to build an official database which suits all intents and purposes. 
 
-# Description
+See scripts in the 'migration' folder to understand how the current development database is structured. 
 
-The Family Promise of Spokane  Organization is a US-based nonprofit organization based in Spokane, WA. They are an organization that helps homeless families as well as preventing families from becoming homeless. They provide shelter for families as well as rental assitance. For the full description visit their website [Family Promise of Spokane](https://www.familypromiseofspokane.org/)
+## Exit Predictions
+One function of the API is to predict where guests at the shelter will exit to, out of five possible destination categories:
+- Permanent Exit
+- Temporary Exit
+- Emergency Shelter
+- Transitional Housing
+- Unknown/Other
+
+We in Labs31 were told there was a model already trained for this purpose. However, it quickly became clear that those who created this model had fallen (understandably) into some very treacherous pits. These pits are:
+- The historical data provided for training had quite a different feature set from the database used by the web backend. Training on the whole dataset results in a model which can't actually be implemented.
+- Guests usually exit _as families_, so a random train-test-split which separates family members will cause leakage. The model will make predictions in the validation set based off where their family member (in the training set) is already known to have exited. This is made terribly clear when you do a time-based split, or a random split which keeps families together. The validation accuracy drops by about 20%.
+
+The solution to these dangers is **caution**. Unfortunately, caution sometimes produces poor metrics. The model currently implemented in the API boasts 45% cross-validation accuracy, and **one** feature (length_of_stay) has 100% of the feature importance. Of course, length_of_stay hardly exists as a feature when a guest first enrolls, so the already-scanty merits of this model are actually worthless until the guest is around for a few weeks. 
+
+The model needs improvement, but without caution any improvements will be useless. I strongly recommend following the below steps as you work on creating a new model. 
+1. **Start with Database Structure** - Don't even be tempted to throw an XGBClassifier on the whole historical dataset. Don't do it! Start by looking closely at _migration.py_, seeing what features you have available. If you've worked with Web to add more features to the database, by all means use those!
+2. **Make Clean DataFrame with Correct Column Names** - Chisel down the historical dataset and rename the columns so that they match up _exactly_ with the features in the database. Don't leave it to the API to rename every feature, every single call. Try to help FastAPI live up to its name.
+3. **Put All Feature Engineering in a Function** - Use this exact function in your API endpoint.
+4. **Sort Columns** - This can go in the feature engineering function. It will make it super easy to line up features in the database exactly as they were in the training data.
+5. **Train Model Inside Pipenv** - Using Colab, even if it trains faster, could easily destroy hours if you're not careful about package versions. Easier just to train within the actual environment your API is using.
+
+## Visualizations
+
+
+
 
 # Contributors
 
@@ -60,257 +84,47 @@ The Family Promise of Spokane  Organization is a US-based nonprofit organization
 
 # Deployed Product
 [Front End Dashboard](https://a.familypromisesofspokane.dev/) |
-[Data Science API](http://fam-prom-the-end.eba-jknbh7ge.us-east-1.elasticbeanstalk.com) |
 [Back End API](https://family-promise-a-be.herokuapp.com/) |
+[Data Science API](http://fam-prom-the-end.eba-jknbh7ge.us-east-1.elasticbeanstalk.com)
 
-# Linked Repositories
-[Family Promise of Spokane Back End](https://github.com/Lambda-School-Labs/family-promise-spokane-be-a) |
-[Family Promise of Spokane Data Science](https://github.com/Lambda-School-Labs/family-promise-spokane-ds-a) |
-[Family Promise of Spokane Front end](https://github.com/Lambda-School-Labs/family-promise-spokane-fe-a) 
+# Repositories
+[Front End](https://github.com/Lambda-School-Labs/family-promise-spokane-fe-a) |
+[Back End](https://github.com/Lambda-School-Labs/family-promise-spokane-be-a) |
+[Data Science](https://github.com/Lambda-School-Labs/family-promise-spokane-ds-a)
 
-# Getting Started
+# Installing Locally
 
-### User Flows
-
-[Trello Board](https://trello.com/b/NWATDZ3U/labs-31-family-promise-a)
-
-Our team is developing a digital intake form for families in Family Promise Shelter. This intake form is a replacement for the paper form currently being filled by guests of the shelter. All the data is provided by the guests. We have a multi-class decision tree model which takes the guest data and predicts their exit destination. The possible exit destinations are as follows:
-- Permanent Exit
-- Temporary Exit
-- Emergency Shelter
-- Transitional Housing
-- Unknown/Other
-
-### Key Features
-
-- Supervisors can Create guest profile 
-- Case Manager can view guest profile 
-- Case Manager can view the exit destination prediction
-- Guest can be flagged for mis conduct
-- notes can be added to guest's profile. 
-- Guest can view their own profile. 
-
-### Environment Variables
-
-In order for the app to function correctly, the user must set up their own environment variables. There should be a .env file containing the following:
-
-    DB_URL="POSTGRES_DATABASE_URL"
-
-
-### Content Licenses
-
-[MIT License](https://github.com/Lambda-School-Labs/family-promise-spokane-ds-a/blob/main/LICENSE)
-
-### Installation Instructions
-
-We used Docker for ease of use when dealing with environmental dependancies 
-
-#### Scripts
-
-    Get AWS credentials
-    
-    Get your AWS access keys
-    
-    Install AWS Command Line Interface
-    
-    * aws configure -> configures AWS CLI
-    * pip install pipx -> installs pipx
-    * pipx install awsebcli -> installs AWS Elastic BeanStalk CLI
-[Follow AWS EB docs](https://docs.labs.lambdaschool.com/data-science/tech/aws-elastic-beanstalk)
-    
-    Then use the EB CLI:
-    
-    * git add --all 
-    * git commit -m "Your commit message" 
-    * eb init -p docker YOUR-APP-NAME --region us-east-1 
-    * eb create YOUR-APP-NAME 
-    * eb open 
-    
-    Then use AWS Route 53 to set up a domain name with HTTPS for your DS API
-    
-    Redeploy:
-    
-    * git commit ... 
-    * docker build ... 
-    * docker push ... 
-    * eb deploy 
-    * eb open 
-
-# Tech Stack
-
-### Data Science API built using:
-
-- Python
-- Docker
-- FastAPI
-- AWS Elastic Beanstalk
-- PostgreSQL
-- Pipenv
-
-### Why we made our tech stack decisions:
-
-- Wanted to gain insight to AWS
-- Docker and Pipenv makes environments easier
-- FastAPI has been gaining traction over Flask
-- SQL queries are better structured 
-
-### Libraries used:
-- FastAPI
-- sci-kit-learn
-- Pandas
-- psycopg2
-
-# User Flow
-
-### Data Science API
-
-We are receiving a POST request with the member id from the web team and using that id to query the database, choose the features used to create the classification model, predict the exit destination and returning a prediction for the exit destination along with the top features in JSON format. 
-
-# Architecture Chart
-![Architecture](https://github.com/Lambda-School-Labs/family-promise-spokane-ds-a/raw/main/architecture_diagram2.png)
-
-
-
-
-# End Points
-/predict: send POST request to this endpoint with the member_id value. 
-
-# Issues
-* Newest Model not implemented Due to the following issues. 
-*  Some Features needed for the new predictive model is not on the back-end Database
-* Some Features on the new Predictive Model differs in data format and data type from the back-end database. 
+Simply clone this repo, enter its directory, and...
 ```
-# This Code Snippet Shows where and how to fix issues
-def set_variables(member_id):
-#current date for Days/ Years calculations
-  today_date = datetime.date.today()
-  results_dict = {} # Dictionary to hold the results value to be transformed to df
-  
-  query = 'SELECT * FROM members,families where members.id = {} and families.id = members.family_id'.format(member_id)
-  results = dbmanage(uri,query)
-#repeated columns need to be used more than once. 
-  enroll_date = results['date_of_enrollment']
-  date_of_birth = datetime.datetime.strptime(
-      results['demographics']['DOB'], '%m-%d-%Y').date()
-# Above Code is working - 
-# Below Commented Out Code needs to be fixed.
-# Not Commented out code, working fine. 
-#sets variables from the db results
-#Project_Name (Probably Take out from model. 
- # results_dict['project_name'] = 'family promise' # This might be removed from last model 
-#Relationship to head of household
-  results_dict['relationship'] = results['demographics']['relationship']
-#Case Members
-  results_dict['case_members'] = results['case_members']
-#enroll date
-  results_dict['enroll_date'] = enroll_date
-#Exit Date (not yet)(need table ? ) 
-  # results_dict['exit_date'] = 'exit date' #not in table. needs to be added. 
-  # Social SEcurity Quality( will need table (not yet))
-  # results_dict['social_security_quality']  = 'Full SSN Given' #PlaceHOlder
-#age at enrollment
-  results_dict['age_at_enrollment'] = int((enroll_date - date_of_birth).days / 365.2425)
-# Race
-  results_dict['race'] = results['demographics']['race']
-#ethnicity
-  results_dict['ethnicity'] = results['demographics']['ethnicity']
-# Gender
-  results_dict['gender'] = results['demographics']['gender']
-#veteran Status
-  results_dict['veteran_status'] = results['gov_benefits']['veteran_services']
-#disabilities at time of entry 
-  results_dict['physical_disabilities'] = results['barriers']['physical_disabilities']
-#living situation (current location)
-  results_dict['living_situation'] = results['homeless_info']['current_location']
-#length of stay
-  results_dict['length_of_stay'] = results['length_of_stay']
-#homeless start date 
-  results_dict['homless_start_date'] = datetime.datetime.strptime(
-      results['homeless_info']['homeless_start_date'], '%d-%b-%Y').date()
-# Length of time homeless aprox start
-  results_dict['length_of_time_homeless'] = results['homeless_info']['total_len_homeless'] 
-  results_dict['time_homeless_last_years'] = results['homeless_info']['total_len_homeless']
-  # results_dict['total_month_homeless_last_year'] = 4 #PlaceHolder. nOt in Database
-# Last Permanent Address
- # results_dict['last_permanent_address'] = results['last_permanent_address'] # database does not have same data format as ds dataset. #needs to be fixed. 
-  results_dict['state'] = (results['last_permanent_address'].split(" "))[-3] 
-  results_dict['zip'] = (results['last_permanent_address'].split(" "))[-2]
-# Enrollment length  
-  results_dict['enrollment_length'] = int((today_date - enroll_date).days) # Days Enrolled in project. 
-  #Housing Status 
-  # results_dict['housing_status'] = 'homeless ' # Place HOlder #Not in backend database. 
-  results_dict['covered_by_insurance'] = results['insurance']['has_insurance']
-#Domestic Violence 
-#  results_dict['domestic_violence'] = results['domestic_violence_info']['fleeing_dv'] #Probably needs chang from boolean to string on backend
-#Household Type
-  results_dict['household_type'] = results['household_type']
-# Last Grade Completed   
-  results_dict['last_grade_completed'] = results['schools']['highest_grade_completed']
-# School Enrolled Status  
- # results_dict['school_status'] = results['schools']['enrolled_status'] #Not the same data format. 
-
-# # Following columns either need to be added to the backend Databse or Removed before training the new model. 
-#    'Employed Status'
-#    'Why Not Employed',
-#    'Count of Bed Nights (Housing Check-ins)'
-#    'Date of Last ES Stay (Beta)'
-#    'Date of First ES Stay (Beta)'
-#    'Income Total at Entry'
-#    'Income Total at Exit'
-#    'Non-Cash Benefit Count'
-#     'Non-Cash Benefit Count at Exit',
-
-  results_dict['barrier_count'] = 0 
-  
-  for item in results['barriers'].values():
-    if item == True:
-      results_dict['barrier_count'] += 1
-#Following column not in database 
-  # 'Under Years Old' # Probably need to remove from model. ? . 
-#Health Issues      
- # results_dict['chronic_health_issues'] = results['barriers']['chronic_health_issues'] # different format backend from dataset. boolean/string. 
-
-#  results_dict['mental_illness'] = results['barriers']['mental_illness'] # different data format backend from dataset boolean/string.
-  #The following columns are not on the backend database
-  # 'CaseChildren'
-  # 'CaseAdults'
-
-  # The following columns need to be condensed to one in data science side . exist on backend as ['health_insurance_type']
-   
-  # 'Other Public'
-  # 'State Funded'
-  # 'Indian Health Services (IHS)'
-  # 'Other'
-  # 'Combined Childrens HealthInsurance/Medicaid'
-  # 'Medicaid'
-  # 'Medicare'
-  # 'State Children's health Insurance S-CHIP'
-  # 'Veteran's Administration Medical Services'
-  # 'Health Insurance obtained through COBRA'
-  # 'Private - Employer'
-  # 'Private'
-  # 'Private - Individual'
-
-# Following Columns are not on the backend database 
- # 'Earned Income',
- # 'Unemployment Insurance'
- # 'Supplemental Security Income',
- # 'Social Security Disability  Income'
- # 'VA Disability Compensation'
- # 'Private Disability Income'
- # 'Workers Compensation'
- # 'TANF',
- # 'General Assistance'
- # 'Child Support'
- # 'Other Income' 
-  
-
- # results_dict['current_age'] = int((today_date - date_of_birth).days / 365.2425 #used on previous model. not used on this model. 
- #     )
+pipenv install
+```
+**If you're on Windows**, it is not recommended to mess with the Pipfile or Pipfile.lock, as this gave us issues while deploying to AWS. If you have to install new packages, either test locally in Docker to make sure the deploy will work, OR reinstall the pipenv in WSL and use that from there on out.
 
 
-   ```
-**If you are having an issue with the existing project code, please submit a bug report under the following guidelines:**
+## Environment Variables
+
+The only required environment variable is DATABASE_URL. Create a new '.env' file in your local repo and add the below.
+
+    DATABASE_URL="YOUR-POSTGRES-DATABASE-URL"
+
+
+# Deploying to AWS
+
+First get your AWS credentials and access keys. Then follow the [Lambda instructions here](https://docs.labs.lambdaschool.com/data-science/tech/aws-elastic-beanstalk).
+
+Note that at the time of this writing, Lambda has recommended you delete the Dockerfile and use the Elastic Beanstalk 'Python' option instead. Personally, I preferred Docker, and would continue to recommend it, as it allows you to perform _exact_ tests locally.
+
+In the Lambda instructions, when you get to **Deploy the first time** step **7**, simply put `--platform docker` instead of the recommended `--platform python-3.7`. That's the only thing you have to do differently.
+
+Of course, don't forget to add your database url to the Elastic Beanstalk environment variables!!
+
+
+# Architecture / Endpoints
+
+The DS API has a handful of endpoints which can be called by the Web frontend or backend through simple GET requests. Visit [the API homepage](http://fam-prom-the-end.eba-jknbh7ge.us-east-1.elasticbeanstalk.com) to understand these endpoints via the interactive docs. 
+
+
+# Bugs
 
 - Check first to see if your issue has already been reported.
 - Check to see if the issue has recently been fixed by attempting to reproduce the issue using the latest master branch in the repository.
@@ -319,26 +133,26 @@ def set_variables(member_id):
 
 
 # Support
-Santiago and Tyler on slack. 
+Reach out to [Ben](https://github.com/bsmrvl).
 
-### Contributing
+# Contributing
 
 When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change.
 
 Describe what you have changed in this repo as a team
 Provide examples and descriptions of components, how props are handled, where to find these changes, database tables, models, etc.
 
-### Feature Requests
+## Feature Requests
 
 We would love to hear from you about new features which would improve this app and further the aims of our project. Please provide as much detail and information as possible to show us why you think your new feature should be implemented.
 
-### Pull Requests
+## Pull Requests
 
 If you have developed a patch, bug fix, or new feature that would improve this app, please submit a pull request. It is best to communicate your ideas with the developers first before investing a great deal of time into a pull request to ensure that it will mesh smoothly with the project.
 
 Remember that this project is licensed under the MIT license, and by submitting a pull request, you agree that your work will be, too.
 
-#### Pull Request Guidelines
+## Pull Request Guidelines
 
 - Ensure any install or build dependencies are removed before the end of the layer when doing a build.
 - Update the README.md with details of changes to the interface, including new plist variables, exposed ports, useful file locations and container parameters.
@@ -346,11 +160,11 @@ Remember that this project is licensed under the MIT license, and by submitting 
 - Include the relevant issue number, if applicable.
 - You may merge the Pull Request in once you have the sign-off of two other developers, or if you do not have permission to do that, you may request the second reviewer to merge it for you.
 
-### Attribution
+## Attribution
 
 These contribution guidelines have been adapted from [this good-Contributing.md-template](https://gist.github.com/PurpleBooth/b24679402957c63ec426).
 
-### Documentation
+# Documentation
 [Front End](https://github.com/Lambda-School-Labs/family-promise-spokane-fe-a/blob/main/README.md)
 
 [Back End](https://github.com/Lambda-School-Labs/family-promise-spokane-be-a/blob/main/README.md)
