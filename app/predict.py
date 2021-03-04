@@ -1,7 +1,6 @@
-"""Machine learning routes/functions"""
+"""Prediction routes/functions."""
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from .db import get_db, Member, Family
 
@@ -14,39 +13,36 @@ PIPELINE = pickle.load(open('app/models/tree3.pickle', 'rb'))
 
 
 
-class PredResponse(BaseModel):
-    """Internal validation to ensure pipeline returns correct dtypes.
-    """
-    member_id: int
-    exit_prediction: str
+### ROUTES ###
 
-
-
-@router.get("/predict-exit/{id}", response_model=PredResponse)
+@router.get("/predict-exit/{id}")
 async def exit_prediction(id: int, session: Session=Depends(get_db)):
-    """Takes member ID and returns prediction. Also updates 'predicted_exit_destination'
-    column in the database.
+    """Updates and returns exit prediction for given member ID.
+
+    Path Parameters:
+    - id (int) : Member ID.
     """
-    db_member = session.query(Member).filter(Member.id==id).first()
-    if db_member is None:
+    member = session.query(Member).filter(Member.id==id).first()
+    if member is None:
         raise HTTPException(status_code=404, detail="Member not found")
 
-    db_family = session.query(Family).filter(Family.id==db_member.family_id).first()
+    family = session.query(Family).filter(Family.id==member.family_id).first()
 
-    db_member.predicted_exit_destination = exit_predict(db_member.__dict__, db_family.__dict__)
+    member.predicted_exit_destination = exit_predict(member.__dict__, family.__dict__)
     session.commit()
 
-    return {'member_id':db_member.id, 
-            'exit_prediction':db_member.predicted_exit_destination}
+    return {'member_id':member.id, 
+            'exit_prediction':member.predicted_exit_destination}
 
 
+
+
+### FUNCTIONS ###
 
 def exit_predict(member, family):
     """A fully functional prediction pipeline, using a TERRIBLE model! 
     """
     norm = pd.concat([pd.json_normalize(member), pd.json_normalize(family)], axis=1)
-    norm['date_of_enrollment'] = pd.to_datetime(norm['date_of_enrollment'])
-    norm['homeless_info.homeless_start_date'] = pd.to_datetime(norm['homeless_info.homeless_start_date'])
 
     norm = _feat_engineer(norm)
 
@@ -54,11 +50,10 @@ def exit_predict(member, family):
     # model object.
     norm = norm.drop(columns=['predicted_exit_destination', '_sa_instance_state'])
 
-    # Drop KPI columns.
+    # Drop KPI columns (for visualizations).
     norm = norm.drop(columns=['date_of_exit', 'income_at_exit', 'exit_destination'])
 
     return PIPELINE.predict(norm)[0]
-
 
 
 
@@ -67,6 +62,10 @@ def _feat_engineer(df):
     on in your model notebook.
     """
     df = df.copy()
+
+    df['homeless_info.homeless_start_date'] = pd.to_datetime(df['homeless_info.homeless_start_date'])
+    df['date_of_enrollment'] = pd.to_datetime(df['date_of_enrollment'])
+
     df['homeless_start_year'] = df['homeless_info.homeless_start_date'].dt.year
     df['homeless_start_doy'] = df['homeless_info.homeless_start_date'].dt.dayofyear
 

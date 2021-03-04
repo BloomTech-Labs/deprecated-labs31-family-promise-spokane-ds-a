@@ -50,6 +50,7 @@ if __name__ == '__main__':
         family = Family(
             id = int(head['5.9 Household ID']),
             homeless_info = {
+                # JSON cannot hold datetime
                 'homeless_start_date':head['3.917 Homeless Start Date']
             },
             insurance = {

@@ -1,4 +1,4 @@
-"""Functions for initiating database connection and making various queries."""
+"""Functions for initiating database sessions."""
 
 import os
 from dotenv import load_dotenv
@@ -21,8 +21,7 @@ async def get_db():
         db.close()
 
 
-# Build models from existing tables
-
+# Build models from existing tables.
 Base = automap_base()
 Base.prepare(engine, reflect=True)
 
