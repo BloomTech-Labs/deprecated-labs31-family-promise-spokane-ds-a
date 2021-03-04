@@ -30,9 +30,9 @@ One function of the API is to predict where guests at the shelter will exit to, 
 
 We in Labs31 were told there was a model already trained for this purpose. However, it quickly became clear that those who created this model had fallen (understandably) into some very treacherous pits. These pits are:
 - The historical data provided for training has quite a different feature set from the database used by the web backend. Training on the whole dataset results in a model which can't actually be implemented. _**Compare 'Sample_data_color_coded.xlsx' with Web database, and update colors as needed.**_
-- Guests usually exit _as families_, so a random train-test-split which separates family members will cause leakage. The model will make predictions in the validation set based off where their family member (in the training set) is already known to have exited. This is made terribly clear when you do a time-based split, or limit the data to heads of households. The validation accuracy drops by about 20%.
+- Guests usually exit _as families_, so a random train-test-split which separates family members will cause leakage. The model will make predictions in the validation set based off where their family member (in the training set) is already known to have exited. This is made terribly clear when you do a time-based split, or limit the data to heads of households. The validation accuracy drops by about 25%.
 
-The solution to these dangers is **caution**. Unfortunately, caution sometimes produces poor metrics. The model currently implemented in the API boasts 45% cross-validation accuracy, and **one** feature (length_of_stay) has 100% of the feature importance. Of course, length_of_stay hardly exists as a feature when a guest first enrolls, so the already-scanty merits of this model are actually worthless until the guest is around for a few weeks. 
+The solution to these dangers is **caution**. Unfortunately, caution sometimes produces poor metrics. The working model now implemented in the API boasts 45% cross-validation accuracy, and **one** feature (length_of_stay) has 100% of the feature importance. Of course, length_of_stay hardly exists as a feature when a guest first enrolls, so the already-scanty merits of this model are actually worthless until the guest is around for a few weeks. 
 
 The model needs improvement, but without caution any improvements will be useless. I strongly recommend following the below steps as you work on creating a new model. _**See 'notebooks/ben_model.ipynb' for more clarity on these steps.**_ 
 1. **Start with Database Structure** - Don't even be tempted to throw an XGBClassifier on the whole historical dataset. Don't do it! Start by looking closely at _migration.py_, seeing what features you have available. If you've worked with Web to add more features to the database, by all means use those.
@@ -42,7 +42,7 @@ The model needs improvement, but without caution any improvements will be useles
 5. **Train Model Inside Pipenv** - Using Colab, even if it trains faster, could easily destroy hours if you're not careful about package versions. Easier just to train within the actual environment your API is using.
 
 ## Visualizations
-The visualization component of the API is complete at the time of writing. However, there may be future requests from the stakeholder for more visualizations. The classes and functions in _visualize.py_ are built to handle two types of plots, moving-average lineplots, and pie charts, both for categorical data. One could easily add more of these plot types on new features, but unfortunately the structure is not so modular that one could branch out into other plot types. To do so would require refactoring or additional classes. For example, one could rename the `Plotter` class something like `PlotterCategorical`, and then create a new, similar class to handle the new plot type.
+The visualization component of the API is complete at the time of writing. However, there may be future requests from the stakeholder for more visualizations. The classes and functions in _visualize.py_ are built to handle two types of plots, moving-average lineplots, and pie charts, both for categorical data. One could easily add more of these plot types on new features, but unfortunately the structure is not so modular that one could branch out into other plot types (say, some sort of continuous numeric plot). To do so would require refactoring or additional classes. For example, one could rename the `Plotter` class something like `PlotterCategorical`, and then create a new, similar class to handle the new plot type.
 
 
 # Installing Locally
@@ -66,7 +66,7 @@ Note that at the time of this writing, Lambda has recommended you delete the Doc
 
 In the Lambda instructions, when you get to **Deploy the first time** step **7**, simply put `--platform docker` instead of the recommended `--platform python-3.7`. That's the only thing you have to do differently.
 
-Of course, don't forget to add your database url to the Elastic Beanstalk environment variables!!
+Of course, don't forget to add your database URL to the Elastic Beanstalk environment variables!!
 
 
 # Architecture / Endpoints
@@ -74,26 +74,19 @@ The DS API has a handful of endpoints which can be called by the Web frontend or
 
 
 # Contributors
-| [Ben Somerville](https://github.com/bsmrvl) |
-| :---: |
-| [<img src="https://avatars.githubusercontent.com/u/70228881?s=400&u=05b1dfcb97cd62deaf5f2afacbd6c2372d945530&v=4" width='200' />](https://github.com/bsmrvl) |
-| Data Scientist |
-| [<img src="https://github.com/favicon.ico" width="15"> ](https://github.com/bsmrvl) |
-| [<img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/ben-somerville/) |
-
-| [Kristine Wang](https://github.com/KristineYW) | [Tyler Etheridge](https://github.com/tyleretheridge) | [Santiago Berniz](https://github.com/sberniz/) | [Leslie Rodriguez](https://github.com/thereactgirl) |
+| [Dominick Bruno ](https://github.com/DomBruno) | [Ben Somerville](https://github.com/bsmrvl) | [Henry Mead](https://www.github.com/hmead15/) | [Jacob Maxfield](https://github.com/MaxTechniche) |
 | :---: | :---: | :---: | :---: | 
-| [<img src="https://avatars0.githubusercontent.com/u/63246056?s=400&u=a10524916b756eb26132d0803bec3cbe62ede1ef&v=4" width = "200" />](https://github.com/KristineYW) | [<img src="https://avatars3.githubusercontent.com/u/61953470?s=400&u=8f8538f4d10dcb45b9179eb6990d1ef9c1aadc8d&v=4" width = "200" />](https://github.com/tyleretheridge) | [<img src="https://avatars3.githubusercontent.com/u/6207914?s=460&u=8bfaa068f7942170423371ff10e8f04f09f41e81&v=4" width = "200" />](https://github.com/sberniz/) | [<img src="https://avatars3.githubusercontent.com/u/46256764?s=400&u=337301ad07625f6977ed520ff7092ae54bb0852f&v=4" width = "200" />](https://github.com/thereactgirl) |
-| TPL | Data Scientist | Data Scientist | Web Developer | Web Developer | 
-|[<img src="https://github.com/favicon.ico" width="15"> ](https://github.com/KristineYW) | [<img src="https://github.com/favicon.ico" width="15"> ](https://github.com/tyleretheridge) | [<img src="https://github.com/favicon.ico" width="15"> ](https://github.com/sberniz/) | [<img src="https://github.com/favicon.ico" width="15"> ](https://github.com/thereactgirl) |
-| [ <img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/kristine-wang-ds/) | [ <img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/tylerjetheridge/) | [ <img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/santiago-berniz/) | [ <img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/thereactgirl/) |          
+| [<img src="https://raw.githubusercontent.com/DomBruno/DomBruno/master/meatchota.jpg" width = "200" />](https://github.com/DomBruno) | [<img src="https://avatars.githubusercontent.com/u/70228881?s=460&u=05b1dfcb97cd62deaf5f2afacbd6c2372d945530&v=4" width = "200" />](https://github.com/bsmrvl) | [<img src="https://avatars.githubusercontent.com/u/63972527?s=400&u=e9b1337009dfe3c325b2168c31de65b59849b6a9&v=4" width = "200" />](https://www.github.com/hmead15/) | [<img src="https://avatars.githubusercontent.com/u/22220702?s=400&u=025f2321bc7fae395a8f3788cf1e5cdca4148c0b&v=4" width = "200" />](https://github.com/MaxTechniche) |
+| TPL | Data Scientist | Data Scientist | Data Scientist | 
+|[<img src="https://github.com/favicon.ico" width="15"> ](https://github.com/DomBruno) | [<img src="https://github.com/favicon.ico" width="15"> ](https://github.com/bsmrvl) | [<img src="https://github.com/favicon.ico" width="15"> ](https://www.github.com/hmead15/) | [<img src="https://github.com/favicon.ico" width="15"> ](https://github.com/MaxTechniche) |
+| [ <img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/dbruno93/) | [ <img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/ben-somerville/) | [ <img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/hcmead) | [ <img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/maxtechniche/) |          
 
-| [Emily Huntwork](https://github.com/Ehuntwork) | [Abdi Mo](https://github.com/abdimohamud) | [Isaiah Fowler](https://github.com/idongessien) |
-| :---: | :---: | :---: |  
-| [<img src="https://avatars1.githubusercontent.com/u/27293120?s=400&u=e6c0fc75189b75dea5233e02562784ed1cfa2faf&v=4" width = "200" />](https://github.com/Ehuntwork) | [<img src="https://avatars1.githubusercontent.com/u/65041807?s=400&u=2ff3514545d906fe2b734fed79c7f8d640b58ae6&v=4" width = "200" />](https://github.com/abdimohamud) | [<img src="https://avatars1.githubusercontent.com/u/66272034?s=400&u=db133631ead14125bb0d5e9515932985c6293448&v=4" width = "200" />](https://github.com/isaiah-j) | 
-| Web Developer | Web Developer | Web Developer | 
-|[<img src="https://github.com/favicon.ico" width="15"> ](https://github.com/Ehuntwork) | [<img src="https://github.com/favicon.ico" width="15"> ](https://github.com/abdimohamud) | [<img src="https://github.com/favicon.ico" width="15"> ](https://github.com/isaiah-j) | 
-| [ <img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/emily-huntwork/) | [ <img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/abdinajib-mohamud/) | [ <img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/isaiah-fowler/) |              
+| [Alice Chang](https://github.com/RococoCoding) | [Melissa Tanksley](https://github.com/MelissaTanksley) | [Evan Barton](https://github.com/notrabe) | [Ramsha Nasir](https://github.com/rnasir826) |
+| :---: | :---: | :---: | :---: | 
+| [<img src="https://avatars.githubusercontent.com/u/63833718?s=460&u=0e06ea3cc648432b6b353a4088de2933cb503e12&v=4" width = "200" />](https://github.com/RococoCoding) | [<img src="https://avatars.githubusercontent.com/u/54566934?s=460&u=66f29e10fbf4e4daff243f782dbfa9e81e87e73d&v=4" width = "200" />](https://github.com/MelissaTanksley) | [<img src="https://avatars.githubusercontent.com/u/67931904?s=400&v=4" width = "200" />](https://github.com/notrabe) | [<img src="https://media-exp1.licdn.com/dms/image/C5603AQF8flKGY9R3ug/profile-displayphoto-shrink_800_800/0/1599613738372?e=1620259200&v=beta&t=pxxDv8DMWPwC-TfpYFD4kWyKHftcCHsEojbUZFp7kQ4" width = "200" />](https://github.com/rnasir826) | 
+| Web Developer | Web Developer | Web Developer | Web Developer |
+|[<img src="https://github.com/favicon.ico" width="15"> ](https://github.com/RococoCoding) | [<img src="https://github.com/favicon.ico" width="15"> ](https://github.com/MelissaTanksley) | [<img src="https://github.com/favicon.ico" width="15"> ](https://github.com/notrabe) | [<img src="https://github.com/favicon.ico" width="15"> ](https://github.com/rnasir826) |
+| [ <img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/rocococode/) | [ <img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/melissa-tanksley-698326191/) | [ <img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/notrabe/) | [ <img src="https://static.licdn.com/sc/h/al2o9zrvru7aqj8e1x2rzsrca" width="15"> ](https://www.linkedin.com/in/ramshanasir14/) |
 
 <br>          
 <br>
